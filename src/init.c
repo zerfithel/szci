@@ -14,7 +14,7 @@ int arg_parse(int argc, char **argv) {
                     const char *themePath = arg + 8;
 
                     #ifdef _WIN32
-                    printf(stderr, "Error: Custom themes are not supported on Windows\n");
+                    fprintf(stderr, "Error: Custom themes are not supported on Windows\n");
                     return 1;
                     #endif
                     if (themePath && *themePath) {
