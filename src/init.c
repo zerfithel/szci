@@ -1,22 +1,8 @@
 #include "init.h"
 
-
-void init(){
-    initscr(); cbreak(); noecho(); keypad(stdscr, TRUE); init_colors();
-    mode=WRITING_MODE;
-    selStart=-1;
-    selEnd=-1;
-    
-
-    text=malloc(sizeof(char));
-    length=0;
-    statusText=malloc(sizeof(char)*200);
-    fileName = NULL;
-    fileSet = false;
-    set_status_text(":)");
-}
-
-void arg_parse(int argc, char **argv) {
+// -1 = continue
+// >=0 = stop and exit with returned value
+int arg_parse(int argc, char **argv) {
     for (int i = 1; i < argc; i++) {
         char *arg = argv[i];
 
@@ -28,22 +14,22 @@ void arg_parse(int argc, char **argv) {
                     const char *themePath = arg + 8;
 
                     #ifdef _WIN32
-                    printf("Error: Custom themes are not supported on Windows");
-                    exit(1);
+                    printf(stderr, "Error: Custom themes are not supported on Windows\n");
+                    return 1;
                     #endif
                     if (themePath && *themePath) {
                         if(load_theme(themePath)){
-                            printf("Error: Failed to load theme %s\n",themePath);
-                            exit(1);
+                            fprintf(stderr, "Error: Failed to load theme %s\n",themePath);
+                            return 1;
                         }
                     } else {
-                        printf("Error: --theme requires a path\n");
-                        exit(1);
+                        fprintf(stderr, "Error: --theme requires a path\n");
+                        return 1;
                     }
                 }
                 else {
-                    printf("Unknown option: %s\n", arg);
-                    exit(1);
+                    fprintf(stderr, "Unknown option: %s\n", arg);
+                    return 1;
                 }
             }
           
@@ -56,14 +42,14 @@ void arg_parse(int argc, char **argv) {
                                    "please open an issue on GitHub.\n"
                                    "Contributions are always welcome!\n"
                                    "Thanks for using szci!\n");
-                            exit(0);
+                            return 0;
                             break;
                         case 'r':
                             readOnly = true;
                             break;
                         default:
-                            printf("Unknown option: -%c\n", arg[j]);
-                            exit(1);
+                            fprintf(stderr, "Unknown option: -%c\n", arg[j]);
+                            return 1;
                     }
                 }
             }
@@ -113,7 +99,9 @@ void arg_parse(int argc, char **argv) {
             }
         }
         else {
-            printf("Ignoring extra argument: %s\n", arg);
+            fprintf(stderr, "Ignoring extra argument: %s\n", arg);
         }
     }
+
+    return -1;
 }

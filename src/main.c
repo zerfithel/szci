@@ -4,9 +4,36 @@
 
 
 int main(int argc, char **argv) {
+    // Initialize global variables
+    mode=WRITING_MODE;
+    selStart=-1;
+    selEnd=-1;
+    text=malloc(sizeof(char));
+    if (!text) {
+        fprintf(stderr, "Error: failed to allocate memory on heap for text\n");
+        return 1;
+    }
+    length=0;
+    statusText=malloc(sizeof(char)*200);
+    if (!statusText) {
+        fprintf(stderr, "Error: failed to allocate memory on heap for status text\n");
+        return 1;
+    }
+    fileName = NULL;
+    fileSet = false;
+    set_status_text(":)");
 
-    init();
-    arg_parse(argc,argv);
+    int exit_code = arg_parse(argc, argv);
+    if (exit_code >= 0) {
+      return exit_code;
+    }
+    
+    // Initialize ncurses
+    initscr();
+    cbreak();
+    noecho();
+    keypad(stdscr, TRUE);
+    init_colors();
 
     render();
     while(true){
